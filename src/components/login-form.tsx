@@ -125,6 +125,7 @@ export function LoginForm({
                     <Label htmlFor="password">Senha</Label>
                     <button
                       type="button"
+                      onClick={() => router.push("/forgot-password")}
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Esqueceu sua senha?

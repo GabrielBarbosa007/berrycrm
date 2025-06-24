@@ -2,13 +2,11 @@
 
 import { createContext, useContext, useState, useEffect } from "react"
 import { useTaskGrouping } from "@/hooks/use-task-grouping"
-import { useTaskFiltering } from "@/hooks/use-task-filtering"
 import { 
   Tarefa, 
   SortField, 
   SortDirection, 
   GroupField, 
-  TaskFilterState,
   ProcessedTarefas,
   GroupHeader
 } from "@/types/task"
