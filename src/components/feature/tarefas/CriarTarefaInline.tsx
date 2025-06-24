@@ -11,8 +11,13 @@ import { AssignedUsersSelector, User } from "@/components/feature/tarefas/Assign
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
 import { DateSelector } from "@/components/feature/tarefas/DateSelector"; // <-- ✅ Novo import
+import { useTarefas } from "@/context/TarefasContext"
+import { v4 as uuidv4 } from "uuid"
 
 export default function CriarTarefaInline({ onClose }: { onClose?: () => void }) {
+  const { adicionarTarefa } = useTarefas()
+  const [titulo, setTitulo] = React.useState("")
+  const [data, setData] = React.useState<Date | null>(new Date())
   const [assigned, setAssigned] = React.useState<User[]>([])
   const [showAssignedPopover, setShowAssignedPopover] = React.useState(false)
 
@@ -23,6 +28,20 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
+
+  const salvar = () => {
+    if (!titulo) return
+    adicionarTarefa({
+      id: uuidv4(),
+      titulo,
+      data,
+      usuario: assigned[0]?.name || "Gabriel Barbosa",
+    })
+    setTitulo("")
+    setData(new Date())
+    setAssigned([])
+    onClose?.()
+  }
 
   return (
     <div
@@ -44,16 +63,18 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
       <Textarea
         className="resize-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-lg px-0 py-2 min-h-[44px] placeholder:text-muted-foreground placeholder:font-normal placeholder:text-[20px]"
         placeholder="Schedule a demo with @Contact"
+        value={titulo}
+        onChange={e => setTitulo(e.target.value)}
       />
       
       {/* Footer */}
       <div className="flex items-center gap-3 mt-3 w-full overflow-x-auto">
-        <DateSelector />
+        <DateSelector value={data} onChange={setData} />
         {/* Assigned to You + Selector */}
         <Popover open={showAssignedPopover} onOpenChange={setShowAssignedPopover}>
           <PopoverTrigger asChild>
             <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-8 text-base font-normal whitespace-nowrap" onClick={() => setShowAssignedPopover(true)}>
-              <User2 className="size-4" />Assigned to You
+              <User2 className="size-4" />{assigned[0]?.name || "Assigned to You"}
             </Button>
           </PopoverTrigger>
           <PopoverContent align="start" className="p-0 w-[340px]">
@@ -69,6 +90,7 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
         </Button>
         <Button
           className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
+          onClick={salvar}
         >
           Save <CornerDownLeft className="size-4 ml-1" />
         </Button>

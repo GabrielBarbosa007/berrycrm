@@ -56,11 +56,6 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "Dashboard",
-          url: "/playground/dashboard",
-          screen: "dashboard",
-        },
-        {
           title: "Tarefas",
           url: "/playground/tarefas",
           screen: "tarefas",

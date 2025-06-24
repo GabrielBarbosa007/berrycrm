@@ -18,6 +18,8 @@ import { Card } from "@/components/ui/card"
 import { ClipboardList, SlidersHorizontal, Filter, ChevronDown, Settings2, CalendarDays, User2, CalendarPlus, ArrowUp01, ArrowDown01, Check, Plus } from "lucide-react"
 import CriarTarefaInline from "./CriarTarefaInline"
 import { AssignedUsersSelector, User } from "@/components/feature/tarefas/AssignedUsersSelector"
+import { useTarefas } from "@/context/TarefasContext"
+import TarefaItem from "./TarefaItem"
 
 
 const GROUP_FIELDS = [
@@ -54,6 +56,8 @@ export default function Tarefas() {
 
   const selectedField = ORDER_FIELDS.find(f => f.value === orderField)
   const selectedDirection = ORDER_DIRECTIONS.find(d => d.value === orderDirection)
+
+  const { tarefas } = useTarefas()
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-background">
@@ -170,23 +174,31 @@ export default function Tarefas() {
       {/* Criar tarefa inline */}
       {openCriarTarefa && <CriarTarefaInline onClose={() => setOpenCriarTarefa(false)} />}
 
-      {/* Área central de estado vazio */}
-      <div className="flex-1 flex flex-col items-center justify-center py-24">
-        <Card className="flex flex-col items-center justify-center border-0 shadow-none bg-transparent p-0">
-          <ClipboardList className="size-20 text-muted-foreground mb-6" />
-          <h2 className="text-2xl font-semibold mb-2">Tarefas</h2>
-          <p className="text-muted-foreground mb-6">Nenhuma tarefa ainda! Crie sua primeira tarefa para começar.</p>
-          <Button
-            variant="default"
-            size="lg"
-            className="flex items-center gap-2 px-6 py-2 text-lg font-medium rounded-xl shadow"
-            style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none' }}
-            onClick={() => setOpenCriarTarefa(true)}
-          >
-            <Plus className="size-5 mr-1" />
-            Nova tarefa
-          </Button>
-        </Card>
+      {/* Lista de tarefas */}
+      <div className="flex-1 flex flex-col items-center justify-start py-8 w-full">
+        <div className="w-full max-w-2xl">
+          {tarefas.length === 0 ? (
+            <Card className="flex flex-col items-center justify-center border-0 shadow-none bg-transparent p-0">
+              <ClipboardList className="size-20 text-muted-foreground mb-6" />
+              <h2 className="text-2xl font-semibold mb-2">Tarefas</h2>
+              <p className="text-muted-foreground mb-6">Nenhuma tarefa ainda! Crie sua primeira tarefa para começar.</p>
+              <Button
+                variant="default"
+                size="lg"
+                className="flex items-center gap-2 px-6 py-2 text-lg font-medium rounded-xl shadow"
+                style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none' }}
+                onClick={() => setOpenCriarTarefa(true)}
+              >
+                <Plus className="size-5 mr-1" />
+                Nova tarefa
+              </Button>
+            </Card>
+          ) : (
+            tarefas.map(tarefa => (
+              <TarefaItem key={tarefa.id} tarefa={tarefa} />
+            ))
+          )}
+        </div>
       </div>
     </div>
   )

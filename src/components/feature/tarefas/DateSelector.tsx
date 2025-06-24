@@ -11,8 +11,13 @@ import { Calendar } from "@/components/ui/calendar"
 import { Button } from "@/components/ui/button"
 import { CalendarDays, Search } from "lucide-react"
 
-export function DateSelector() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
+export function DateSelector({ value, onChange }: { value?: Date | null, onChange?: (date: Date | null) => void }) {
+  const [internalDate, setInternalDate] = useState<Date | undefined>(new Date())
+  const date = value !== undefined ? value || undefined : internalDate
+  const setDate = (d: Date | undefined) => {
+    if (onChange) onChange(d ?? null)
+    else setInternalDate(d)
+  }
 
   return (
     <Popover>
