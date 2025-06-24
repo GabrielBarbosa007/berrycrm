@@ -46,7 +46,7 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
+      title: "Produtividade",
       url: "#",
       icon: SquareTerminal,
       isActive: true,
@@ -57,12 +57,12 @@ const data = {
           screen: "tarefas",
         },
         {
-          title: "Relatórios",
+          title: "E-mail",
           url: "/playground/relatorios",
           screen: "relatorios",
         },
         {
-          title: "Usuários",
+          title: "Notas",
           url: "/playground/usuarios",
           screen: "usuarios",
         },
