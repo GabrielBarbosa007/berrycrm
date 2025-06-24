@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { User2, X, CornerDownLeft } from "lucide-react";
 import { AssignedUsersSelector, User } from "@/components/feature/tarefas/AssignedUsersSelector"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { toast } from "sonner";
 
 import { DateSelector } from "@/components/feature/tarefas/DateSelector"; // <-- ✅ Novo import
 import { useTarefas, Tarefa } from "@/context/TarefasContext"
@@ -26,10 +27,21 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
   const [data, setData] = React.useState<Date | null>(tarefaParaEditar?.data || new Date())
   const [assigned, setAssigned] = React.useState<User[]>([])
   const [showAssignedPopover, setShowAssignedPopover] = React.useState(false)
+  const [createMore, setCreateMore] = React.useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("berrycrm_createMore")
+      return stored === "true"
+    }
+    return false
+  })
+  const [isLoading, setIsLoading] = React.useState(false)
+  const tituloRef = React.useRef<HTMLTextAreaElement>(null)
+  const [resetAnim, setResetAnim] = React.useState(false)
 
   React.useEffect(() => {
     setTitulo(tarefaParaEditar?.titulo || "")
     setData(tarefaParaEditar?.data || new Date())
+    setAssigned([])
   }, [tarefaParaEditar])
 
   React.useEffect(() => {
@@ -40,19 +52,56 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onClose]);
 
-  const salvar = () => {
-    if (!titulo) return
+  // Persistência do toggle
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("berrycrm_createMore", String(createMore))
+    }
+  }, [createMore])
+
+  // Reset suave
+  const resetForm = () => {
+    setResetAnim(true)
+    setTitulo("")
+    setData(new Date())
+    setAssigned([])
+    setTimeout(() => {
+      setResetAnim(false)
+      tituloRef.current?.focus()
+    }, 250)
+  }
+
+  const salvar = async () => {
+    if (isLoading) return
+    if (!titulo || !data) {
+      toast.error("Preencha o título e a data.")
+      return
+    }
+    setIsLoading(true)
     const novaTarefa: Tarefa = {
       id: tarefaParaEditar?.id || uuidv4(),
       titulo,
       data,
       usuario: assigned[0]?.name || "Gabriel Barbosa",
     }
-    isEditando ? editarTarefa(novaTarefa) : adicionarTarefa(novaTarefa)
-    setTitulo("")
-    setData(new Date())
-    setAssigned([])
-    onClose?.()
+    try {
+      if (isEditando) {
+        await editarTarefa(novaTarefa)
+      } else {
+        await adicionarTarefa(novaTarefa)
+      }
+      if (createMore && !isEditando) {
+        resetForm()
+        toast.success("Tarefa criada! Crie outra ou feche quando quiser.")
+      } else {
+        setTitulo("")
+        setData(new Date())
+        setAssigned([])
+        onClose?.()
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -73,7 +122,8 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
       
       {/* Textarea */}
       <Textarea
-        className="resize-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-lg px-0 py-2 min-h-[44px] placeholder:text-muted-foreground placeholder:font-normal placeholder:text-[20px]"
+        ref={tituloRef}
+        className={`resize-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-lg px-0 py-2 min-h-[44px] placeholder:text-muted-foreground placeholder:font-normal placeholder:text-[20px] ${resetAnim ? "animate-pulse" : ""}`}
         placeholder="Schedule a demo with @Contact"
         value={titulo}
         onChange={e => setTitulo(e.target.value)}
@@ -94,7 +144,7 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
           </PopoverContent>
         </Popover>
         <div className="flex items-center gap-2 ml-2">
-          <Switch id="create-more" />
+          <Switch id="create-more" checked={createMore} onCheckedChange={setCreateMore} />
           <Label htmlFor="create-more" className="text-base font-normal cursor-pointer whitespace-nowrap ml-1">Create more</Label>
         </div>
         <Button variant="ghost" className="h-9 px-4 text-base font-normal text-muted-foreground ml-2" onClick={onClose}>
@@ -103,8 +153,9 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
         <Button
           className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
           onClick={salvar}
+          disabled={isLoading}
         >
-          Save <CornerDownLeft className="size-4 ml-1" />
+          {isLoading ? "Salvando..." : <>Save <CornerDownLeft className="size-4 ml-1" /></>}
         </Button>
       </div>
     </div>
