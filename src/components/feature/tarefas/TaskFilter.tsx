@@ -112,10 +112,12 @@ export default function TaskFilter({ value, onChange, assignees, tags = [], onCl
       {chips.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
           {chips.map((chip, i) => (
-            <span key={i} className="flex items-center bg-muted px-2 py-1 rounded-full text-xs">
-              {chip.label}
-              <button className="ml-1" onClick={chip.onRemove}><X className="size-3" /></button>
-            </span>
+            chip && (
+              <span key={i} className="flex items-center bg-muted px-2 py-1 rounded-full text-xs">
+                {chip.label}
+                <button className="ml-1" onClick={chip.onRemove}><X className="size-3" /></button>
+              </span>
+            )
           ))}
           <Button variant="ghost" size="sm" className="text-xs" onClick={clearAll}>Limpar todos</Button>
         </div>
