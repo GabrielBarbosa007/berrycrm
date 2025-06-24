@@ -25,9 +25,9 @@ function ConfirmDeleteModal({ open, onCancel, onConfirm }: { open: boolean, onCa
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <button className="px-4 py-2 rounded-md border bg-white text-gray-700 hover:bg-gray-100" onClick={onCancel}>Cancel</button>
+            <Button variant="outline" onClick={onCancel}>Cancel</Button>
           </DialogClose>
-          <button className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700" onClick={onConfirm}>Delete</button>
+          <Button variant="destructive" onClick={onConfirm}>Delete</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -67,16 +67,16 @@ export default function TarefaItem({ tarefa, onEdit }: { tarefa: Tarefa, onEdit?
   return (
     <div
       className={
-        `flex items-center gap-4 p-4 border rounded-xl bg-white shadow-sm mb-2 transition-all duration-300 ${
+        `flex items-center gap-4 p-4 border rounded-xl bg-card shadow-sm mb-2 transition-all duration-300 ${
           isCompleted 
-            ? "opacity-60 bg-gray-50" 
+            ? "opacity-60 bg-muted/50" 
             : "hover:shadow-md"
         }`
       }
     >
       {isCompleted ? (
-        <div className="flex items-center justify-center w-4 h-4 rounded border-2 bg-blue-500 border-blue-500">
-          <Check className="w-3 h-3 text-white" />
+        <div className="flex items-center justify-center w-4 h-4 rounded border-2 bg-primary border-primary">
+          <Check className="w-3 h-3 text-primary-foreground" />
         </div>
       ) : (
         <Checkbox
@@ -90,7 +90,7 @@ export default function TarefaItem({ tarefa, onEdit }: { tarefa: Tarefa, onEdit?
         className={`flex-1 rounded-md px-2 py-1 transition ${
           isCompleted 
             ? "cursor-default" 
-            : "cursor-pointer hover:bg-muted"
+            : "cursor-pointer hover:bg-accent"
         }`}
         onClick={() => !isCompleted && onEdit && onEdit()}
         tabIndex={isCompleted ? -1 : 0}
@@ -98,12 +98,12 @@ export default function TarefaItem({ tarefa, onEdit }: { tarefa: Tarefa, onEdit?
         aria-label={isCompleted ? undefined : "Editar tarefa"}
       >
         <div className={`font-medium text-base line-clamp-1 ${
-          isCompleted ? "text-gray-500 line-through" : ""
+          isCompleted ? "text-muted-foreground line-through" : ""
         }`}>
           {tarefa.titulo}
         </div>
         <div className={`flex gap-4 text-xs mt-1 ${
-          isCompleted ? "text-gray-400" : "text-muted-foreground"
+          isCompleted ? "text-muted-foreground/60" : "text-muted-foreground"
         }`}>
           <span className="flex items-center gap-1">
             <CalendarDays className="size-3" />

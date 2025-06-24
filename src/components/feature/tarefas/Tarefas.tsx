@@ -60,7 +60,7 @@ export default function Tarefas() {
   return (
     <div className="flex flex-col h-full min-h-screen bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between gap-2 py-6 px-8 border-b bg-white sticky top-0 z-10">
+      <div className="flex items-center justify-between gap-2 py-6 px-8 border-b bg-background sticky top-0 z-10">
         <h1 className="text-2xl font-bold tracking-tight">Tarefas</h1>
         <div className="flex items-center gap-2">
           <GroupByDropdown
@@ -72,7 +72,6 @@ export default function Tarefas() {
           <Button
             variant="default"
             className="ml-2 flex items-center gap-2 px-6 py-2 text-lg font-medium rounded-xl shadow"
-            style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none' }}
             onClick={() => setOpenCriarTarefa(true)}
           >
             <Plus className="size-5 mr-1" />
@@ -120,7 +119,6 @@ export default function Tarefas() {
                 variant="default"
                 size="lg"
                 className="flex items-center gap-2 px-6 py-2 text-lg font-medium rounded-xl shadow"
-                style={{ backgroundColor: '#2563eb', color: '#fff', border: 'none' }}
                 onClick={() => setOpenCriarTarefa(true)}
               >
                 <Plus className="size-5 mr-1" />

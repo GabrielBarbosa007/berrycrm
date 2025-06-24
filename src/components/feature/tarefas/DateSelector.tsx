@@ -24,7 +24,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
-          className="flex items-center gap-2 px-2 h-8 text-sm border bg-white rounded-md shadow-sm"
+          className="flex items-center gap-2 px-2 h-8 text-sm border bg-background rounded-md shadow-sm"
         >
           <CalendarDays className="size-4" />
           {date ? format(date, "PPP") : "Today"}
@@ -33,7 +33,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
 
       <PopoverContent
         align="start"
-        className="w-[320px] p-0 rounded-2xl shadow-lg border border-gray-100 bg-white"
+        className="w-[320px] p-0 rounded-2xl shadow-lg border"
         style={{ minWidth: 320 }}
       >
         {/* Campo de busca textual com ícone de lupa */}
@@ -41,9 +41,9 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
           <input
             type="text"
             placeholder="Next Tuesday..."
-            className="w-full text-sm px-3 py-2 rounded-md border border-gray-200 outline-none bg-white placeholder:text-gray-400 pr-9 focus:ring-2 focus:ring-primary/10 transition-all"
+            className="w-full text-sm px-3 py-2 rounded-md border bg-background placeholder:text-muted-foreground pr-9 focus:ring-2 focus:ring-ring/50 transition-all"
           />
-          <span className="absolute right-5 text-gray-400">
+          <span className="absolute right-5 text-muted-foreground">
             <Search size={16} />
           </span>
         </div>
@@ -65,7 +65,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
             <Button
               variant="outline"
               size="sm"
-              className="text-xs px-3 h-7 whitespace-nowrap border-gray-200 flex items-center gap-1"
+              className="text-xs px-3 h-7 whitespace-nowrap flex items-center gap-1"
               onClick={() => setDate(new Date())}
             >
               <CalendarDays size={14} /> Today
@@ -73,7 +73,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
             <Button
               variant="outline"
               size="sm"
-              className="text-xs px-3 h-7 whitespace-nowrap border-gray-200 flex items-center gap-1"
+              className="text-xs px-3 h-7 whitespace-nowrap flex items-center gap-1"
               onClick={() => {
                 const t = new Date()
                 t.setDate(t.getDate() + 1)
@@ -85,7 +85,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
             <Button
               variant="outline"
               size="sm"
-              className="text-xs px-3 h-7 whitespace-nowrap border-gray-200 flex items-center gap-1"
+              className="text-xs px-3 h-7 whitespace-nowrap flex items-center gap-1"
               onClick={() => {
                 const t = new Date()
                 t.setDate(t.getDate() + 7)
@@ -97,7 +97,7 @@ export function DateSelector({ value, onChange }: { value?: Date | null, onChang
             <Button
               variant="outline"
               size="sm"
-              className="text-xs px-3 h-7 whitespace-nowrap border-gray-200 flex items-center gap-1"
+              className="text-xs px-3 h-7 whitespace-nowrap flex items-center gap-1"
               onClick={() => setDate(undefined)}
             >
               <span className="inline-block"><CalendarDays size={14} /></span> No date

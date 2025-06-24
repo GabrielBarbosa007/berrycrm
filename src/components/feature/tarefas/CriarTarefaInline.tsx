@@ -107,8 +107,7 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
 
   return (
     <div
-      className="w-full max-w-[768px] mx-auto mt-6 rounded-2xl border bg-white px-6 pt-4 pb-3 shadow-[0_4px_32px_0_rgba(16,30,54,0.08)]"
-      style={{ boxShadow: "0 4px 32px 0 rgba(16,30,54,0.08)" }}
+      className="w-full max-w-[768px] mx-auto mt-6 rounded-2xl border bg-card px-6 pt-4 pb-3 shadow-lg"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
@@ -124,7 +123,7 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
       {/* Textarea */}
       <Textarea
         ref={tituloRef}
-        className={`resize-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-lg px-0 py-2 min-h-[44px] placeholder:text-muted-foreground placeholder:font-normal placeholder:text-[20px] ${resetAnim ? "animate-pulse" : ""}`}
+        className={`resize-none border-0 shadow-none ring-0 focus-visible:ring-0 focus-visible:border-0 text-lg px-0 py-2 min-h-[44px] placeholder:text-muted-foreground placeholder:font-normal placeholder:text-[20px] bg-transparent ${resetAnim ? "animate-pulse" : ""}`}
         placeholder="Schedule a demo with @Contact"
         value={titulo}
         onChange={e => setTitulo(e.target.value)}
@@ -152,7 +151,8 @@ export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTa
           Cancel <span className="ml-1 text-xs">ESC</span>
         </Button>
         <Button
-          className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
+          variant="default"
+          className="h-9 px-5 text-base font-semibold flex items-center gap-2"
           onClick={salvar}
           disabled={isLoading}
         >
