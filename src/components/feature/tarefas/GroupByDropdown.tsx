@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Settings2, ChevronDown, Check, CalendarDays, User2, CalendarPlus } from "lucide-react"
-import { GroupField } from "@/context/TarefasContext"
+import { GroupField } from "@/types/task"
 
 const GROUP_FIELDS = [
   { label: "Data de vencimento", value: "due" as GroupField, icon: CalendarDays },

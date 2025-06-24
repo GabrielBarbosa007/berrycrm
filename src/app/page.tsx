@@ -19,7 +19,6 @@ import React from "react"
 import Tarefas from "@/components/feature/tarefas/Tarefas"
 import Relatorios from "@/components/feature/relatorios/Relatorios"
 import Usuarios from "@/components/feature/usuarios/Usuarios"
-import { TasksProvider } from "@/hooks/use-tasks"
 import { TarefasProvider } from "@/context/TarefasContext"
 
 export default function Page() {
@@ -27,7 +26,7 @@ export default function Page() {
 
   return (
     <SidebarProvider>
-      <TasksProvider>
+      <TarefasProvider>
         <AppSidebar onScreenChange={setScreen} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
@@ -59,16 +58,12 @@ export default function Page() {
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           
-            {screen === "tarefas" && (
-              <TarefasProvider>
-                <Tarefas />
-              </TarefasProvider>
-            )}
+            {screen === "tarefas" && <Tarefas />}
             {screen === "relatorios" && <Relatorios />}
             {screen === "usuarios" && <Usuarios />}
           </div>
         </SidebarInset>
-      </TasksProvider>
+      </TarefasProvider>
     </SidebarProvider>
   )
 }

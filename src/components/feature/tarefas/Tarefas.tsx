@@ -5,11 +5,13 @@ import { Plus, ClipboardList } from "lucide-react"
 import CriarTarefaInline from "./CriarTarefaInline"
 import { useTarefas } from "@/context/TarefasContext"
 import TarefaItem from "./TarefaItem"
-import { Tarefa } from "@/context/TarefasContext"
+import { Tarefa } from "@/types/task"
 import SortDropdown from "./SortDropdown"
 import GroupByDropdown from "./GroupByDropdown"
 import GroupHeader from "./GroupHeader"
-import TaskFilter, { TaskFilterState } from "./TaskFilter"
+import TaskFilter from "./TaskFilter"
+import { useTaskFiltering, TaskFilterState } from "@/hooks/use-task-filtering"
+import { useTaskGrouping } from "@/hooks/use-task-grouping"
 
 export default function Tarefas() {
   const [openCriarTarefa, setOpenCriarTarefa] = useState(false)
@@ -33,8 +35,7 @@ export default function Tarefas() {
     setSortField,
     setSortDirection,
     setGroupField,
-    setShowCompleted,
-    processTarefasWithFilters
+    setShowCompleted
   } = useTarefas()
 
   // Lista de cessionários únicos
@@ -44,27 +45,17 @@ export default function Tarefas() {
     return Array.from(set)
   }, [tarefas])
 
-  // Aplicar filtros ao array de tarefas antes do agrupamento/ordenação
-  const tarefasFiltradas = useMemo(() => {
-    return tarefas.filter(t => {
-      // Se showCompleted é false, excluir tarefas concluídas
-      if (!showCompleted && t.concluida) return false
-      
-      // Aplicar outros filtros
-      if (filter.title && !t.titulo.toLowerCase().includes(filter.title.toLowerCase())) return false
-      if (filter.assignee && t.usuario !== filter.assignee) return false
-      if (filter.dueStart && (!t.data || new Date(t.data) < filter.dueStart)) return false
-      if (filter.dueEnd && (!t.data || new Date(t.data) > filter.dueEnd)) return false
-      // Tags/status: placeholder
-      if (filter.tags.length > 0) return false // ajuste quando houver tags
-      return true
-    })
-  }, [tarefas, filter, showCompleted])
+  // Aplicar filtros usando hook customizado
+  const tarefasFiltradas = useTaskFiltering(tarefas, filter, showCompleted)
 
-  // Processar tarefas filtradas
-  const { processedTarefas: tarefasProcessadas, groupHeaders: headersProcessados } = useMemo(() => {
-    return processTarefasWithFilters(tarefasFiltradas)
-  }, [tarefasFiltradas, processTarefasWithFilters])
+  // Processar tarefas filtradas usando hook customizado
+  const { processedTarefas: tarefasProcessadas, groupHeaders: headersProcessados } = useTaskGrouping(
+    tarefasFiltradas,
+    groupField,
+    showCompleted,
+    sortField,
+    sortDirection
+  )
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-background">

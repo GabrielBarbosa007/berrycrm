@@ -12,7 +12,8 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { toast } from "sonner";
 
 import { DateSelector } from "@/components/feature/tarefas/DateSelector"; // <-- ✅ Novo import
-import { useTarefas, Tarefa } from "@/context/TarefasContext"
+import { useTarefas } from "@/context/TarefasContext"
+import { Tarefa } from "@/types/task"
 import { v4 as uuidv4 } from "uuid"
 
 interface CriarTarefaInlineProps {

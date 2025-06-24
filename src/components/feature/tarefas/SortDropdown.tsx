@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { SlidersHorizontal, ChevronDown, Check, CalendarDays, User2, CalendarPlus, ArrowUp01, ArrowDown01 } from "lucide-react"
-import { SortField, SortDirection } from "@/context/TarefasContext"
+import { SortField, SortDirection } from "@/types/task"
 
 const ORDER_FIELDS = [
   { label: "Data de vencimento", value: "due" as SortField, icon: CalendarDays },

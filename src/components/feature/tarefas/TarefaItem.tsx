@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Task } from "@/hooks/use-tasks";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { CalendarDays, User2, X, Check } from "lucide-react";
-import { Tarefa, useTarefas } from "@/context/TarefasContext";
+import { useTarefas } from "@/context/TarefasContext";
+import { Tarefa } from "@/types/task";
 import {
   Dialog,
   DialogContent,
@@ -34,26 +34,17 @@ function ConfirmDeleteModal({ open, onCancel, onConfirm }: { open: boolean, onCa
   );
 }
 
-export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, task?: Task, onEdit?: () => void }) {
+export default function TarefaItem({ tarefa, onEdit }: { tarefa: Tarefa, onEdit?: () => void }) {
   const { removerTarefa, handleCompleteTask } = useTarefas();
   const [modalOpen, setModalOpen] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
-  // Preferir tarefa do contexto, mas manter compatibilidade com task
-  const t = tarefa || (task ? {
-    id: task.id,
-    titulo: task.title,
-    data: task.dueDate ? new Date(task.dueDate) : null,
-    usuario: task.assignee,
-    concluida: false,
-  } : undefined)
-  if (!t) return null
 
   async function onCheck(e: React.MouseEvent | React.TouchEvent) {
     e.stopPropagation();
-    if (!t || isCompleting || t.concluida) return;
+    if (isCompleting || tarefa.concluida) return;
     setIsCompleting(true);
     try {
-      await handleCompleteTask(t.id);
+      await handleCompleteTask(tarefa.id);
       // Não remover automaticamente - deixar o contexto gerenciar a exibição
     } catch {
       toast.error("Erro ao concluir tarefa");
@@ -71,7 +62,7 @@ export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, 
     setModalOpen(true);
   }
 
-  const isCompleted = t.concluida || isCompleting;
+  const isCompleted = tarefa.concluida || isCompleting;
 
   return (
     <div
@@ -109,18 +100,18 @@ export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, 
         <div className={`font-medium text-base line-clamp-1 ${
           isCompleted ? "text-gray-500 line-through" : ""
         }`}>
-          {t.titulo}
+          {tarefa.titulo}
         </div>
         <div className={`flex gap-4 text-xs mt-1 ${
           isCompleted ? "text-gray-400" : "text-muted-foreground"
         }`}>
           <span className="flex items-center gap-1">
             <CalendarDays className="size-3" />
-            {t.data ? new Date(t.data).toLocaleDateString() : '-'}
+            {tarefa.data ? new Date(tarefa.data).toLocaleDateString() : '-'}
           </span>
           <span className="flex items-center gap-1">
             <User2 className="size-3" />
-            {t.usuario}
+            {tarefa.usuario}
           </span>
         </div>
       </div>
@@ -136,7 +127,7 @@ export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, 
       <ConfirmDeleteModal
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        onConfirm={() => handleDeleteTask(t.id)}
+        onConfirm={() => handleDeleteTask(tarefa.id)}
       />
     </div>
   );

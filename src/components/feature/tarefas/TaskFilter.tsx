@@ -4,14 +4,7 @@ import { Button } from "@/components/ui/button"
 import { X, Filter } from "lucide-react"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 import { DateSelector } from "./DateSelector"
-
-interface TaskFilterState {
-  title: string
-  assignee: string
-  dueStart: Date | null
-  dueEnd: Date | null
-  tags: string[]
-}
+import { TaskFilterState } from "@/types/task"
 
 interface TaskFilterProps {
   value: TaskFilterState
@@ -124,6 +117,4 @@ export default function TaskFilter({ value, onChange, assignees, tags = [], onCl
       )}
     </div>
   )
-}
-
-export type { TaskFilterState } 
+} 
