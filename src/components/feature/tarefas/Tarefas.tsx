@@ -17,6 +17,7 @@ import { Card } from "@/components/ui/card"
 // import { Switch } from "@/components/ui/switch"
 import { ClipboardList, SlidersHorizontal, Filter, ChevronDown, Settings2, CalendarDays, User2, CalendarPlus, ArrowUp01, ArrowDown01, Check, Plus } from "lucide-react"
 import CriarTarefaInline from "./CriarTarefaInline"
+import { AssignedUsersSelector, User } from "@/components/feature/tarefas/AssignedUsersSelector"
 
 
 const GROUP_FIELDS = [
@@ -49,6 +50,7 @@ export default function Tarefas() {
   const [groupField, setGroupField] = React.useState("due")
   const [showCompleted, setShowCompleted] = React.useState(true)
   const [openCriarTarefa, setOpenCriarTarefa] = React.useState(false)
+  const [assigned, setAssigned] = React.useState<User[]>([])
 
   const selectedField = ORDER_FIELDS.find(f => f.value === orderField)
   const selectedDirection = ORDER_DIRECTIONS.find(d => d.value === orderDirection)

@@ -6,11 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { CalendarDays, User2, CornerUpRight, X, CornerDownLeft } from "lucide-react";
+import { User2, X, CornerDownLeft } from "lucide-react";
+import { AssignedUsersSelector, User } from "@/components/feature/tarefas/AssignedUsersSelector"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
 import { DateSelector } from "@/components/feature/tarefas/DateSelector"; // <-- ✅ Novo import
 
 export default function CriarTarefaInline({ onClose }: { onClose?: () => void }) {
+  const [assigned, setAssigned] = React.useState<User[]>([])
+  const [showAssignedPopover, setShowAssignedPopover] = React.useState(false)
+
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === "Escape" && onClose) onClose();
@@ -42,33 +47,31 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
       />
       
       {/* Footer */}
-      <div className="flex items-center justify-between mt-3">
-        <div className="flex items-center gap-2">
-          {/* ✅ Substituído por calendário funcional */}
-          <DateSelector />
-          
-          <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-8 text-base font-normal">
-            <User2 className="size-4" />Assigned to You
-          </Button>
-          <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-8 text-base font-normal">
-            <CornerUpRight className="size-4" />Add Record
-          </Button>
+      <div className="flex items-center gap-3 mt-3 w-full overflow-x-auto">
+        <DateSelector />
+        {/* Assigned to You + Selector */}
+        <Popover open={showAssignedPopover} onOpenChange={setShowAssignedPopover}>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2 h-8 text-base font-normal whitespace-nowrap" onClick={() => setShowAssignedPopover(true)}>
+              <User2 className="size-4" />Assigned to You
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="start" className="p-0 w-[340px]">
+            <AssignedUsersSelector value={assigned} onChange={setAssigned} />
+          </PopoverContent>
+        </Popover>
+        <div className="flex items-center gap-2 ml-2">
+          <Switch id="create-more" />
+          <Label htmlFor="create-more" className="text-base font-normal cursor-pointer whitespace-nowrap ml-1">Create more</Label>
         </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 mr-4">
-            <Switch id="create-more" />
-            <Label htmlFor="create-more" className="text-base font-normal cursor-pointer">Create more</Label>
-          </div>
-          <Button variant="ghost" className="h-9 px-4 text-base font-normal text-muted-foreground" onClick={onClose}>
-            Cancel <span className="ml-1 text-xs">ESC</span>
-          </Button>
-          <Button
-            className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
-          >
-            Save <CornerDownLeft className="size-4 ml-1" />
-          </Button>
-        </div>
+        <Button variant="ghost" className="h-9 px-4 text-base font-normal text-muted-foreground ml-2" onClick={onClose}>
+          Cancel <span className="ml-1 text-xs">ESC</span>
+        </Button>
+        <Button
+          className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
+        >
+          Save <CornerDownLeft className="size-4 ml-1" />
+        </Button>
       </div>
     </div>
   );
