@@ -7,12 +7,15 @@ export interface Tarefa {
   titulo: string
   data: Date | null
   usuario: string
+  concluida?: boolean
 }
 
 interface TarefasContextType {
   tarefas: Tarefa[]
   adicionarTarefa: (nova: Tarefa) => void
   editarTarefa: (tarefaEditada: Tarefa) => void
+  removerTarefa: (id: string) => void
+  handleCompleteTask: (id: string) => Promise<void>
 }
 
 const TarefasContext = createContext<TarefasContextType | undefined>(undefined)
@@ -28,8 +31,24 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
     setTarefas(prev => prev.map(t => (t.id === tarefaEditada.id ? tarefaEditada : t)))
   }
 
+  const removerTarefa = (id: string) => {
+    setTarefas(prev => prev.filter(t => t.id !== id))
+  }
+
+  const handleCompleteTask = async (id: string) => {
+    try {
+      setTarefas(prev => prev.map(t => t.id === id ? { ...t, concluida: true } : t))
+      // Simular persistência backend (substitua por chamada real se necessário)
+      await new Promise(res => setTimeout(res, 100))
+    } catch (e) {
+      // fallback de erro
+      setTarefas(prev => prev.map(t => t.id === id ? { ...t, concluida: false } : t))
+      throw e
+    }
+  }
+
   return (
-    <TarefasContext.Provider value={{ tarefas, adicionarTarefa, editarTarefa }}>
+    <TarefasContext.Provider value={{ tarefas, adicionarTarefa, editarTarefa, removerTarefa, handleCompleteTask }}>
       {children}
     </TarefasContext.Provider>
   )

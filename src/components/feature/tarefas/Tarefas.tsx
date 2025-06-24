@@ -202,9 +202,11 @@ export default function Tarefas() {
             </Card>
           ) : (
             tarefas.map(tarefa => (
-              <div key={tarefa.id} onClick={() => setTarefaSelecionada(tarefa)} style={{ cursor: 'pointer' }}>
-                <TarefaItem tarefa={tarefa} />
-              </div>
+              <TarefaItem
+                key={tarefa.id}
+                tarefa={tarefa}
+                onEdit={() => setTarefaSelecionada(tarefa)}
+              />
             ))
           )}
         </div>

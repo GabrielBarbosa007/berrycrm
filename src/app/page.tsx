@@ -19,7 +19,6 @@ import React from "react"
 import Tarefas from "@/components/feature/tarefas/Tarefas"
 import Relatorios from "@/components/feature/relatorios/Relatorios"
 import Usuarios from "@/components/feature/usuarios/Usuarios"
-import Dashboard from "@/components/feature/dashboard/Dashboard"
 import { TasksProvider } from "@/hooks/use-tasks"
 import { TarefasProvider } from "@/context/TarefasContext"
 
@@ -59,7 +58,7 @@ export default function Page() {
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            {screen === "dashboard" && <Dashboard />}
+          
             {screen === "tarefas" && (
               <TarefasProvider>
                 <Tarefas />
