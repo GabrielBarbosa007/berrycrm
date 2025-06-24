@@ -18,14 +18,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  fullName: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
   email: z.string().email("E-mail inválido"),
-  password: z.string().min(1, "Senha é obrigatória"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Senhas não coincidem",
+  path: ["confirmPassword"],
 })
 
-type LoginFormData = z.infer<typeof loginSchema>
+type RegisterFormData = z.infer<typeof registerSchema>
 
-export function LoginForm({
+export function RegisterForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -36,31 +41,35 @@ export function LoginForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
   })
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: RegisterFormData) => {
     setIsLoading(true)
     try {
       // Simular chamada para API
       await new Promise(resolve => setTimeout(resolve, 1000))
       
       // Mock da resposta da API
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          fullName: data.fullName,
+          email: data.email,
+          password: data.password,
+        }),
       })
 
       if (response.ok) {
-        toast.success("Login realizado com sucesso!")
-        router.push("/")
+        toast.success("Conta criada com sucesso!")
+        router.push("/login")
       } else {
         const errorData = await response.json()
-        toast.error(errorData.message || "Credenciais inválidas")
+        toast.error(errorData.message || "Erro ao criar conta")
       }
     } catch {
       toast.error("Erro ao conectar com o servidor")
@@ -73,9 +82,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Bem-vindo de volta</CardTitle>
+          <CardTitle className="text-xl">Crie sua conta</CardTitle>
           <CardDescription>
-            Faça login com sua conta Apple ou Google
+            Comece gratuitamente
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -89,7 +98,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Entrar com Apple
+                  Cadastrar com Apple
                 </Button>
                 <Button variant="outline" className="w-full" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -98,7 +107,7 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Entrar com Google
+                  Cadastrar com Google
                 </Button>
               </div>
               <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
@@ -108,11 +117,24 @@ export function LoginForm({
               </div>
               <div className="grid gap-6">
                 <div className="grid gap-3">
+                  <Label htmlFor="fullName">Nome completo</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    placeholder="João Silva"
+                    {...register("fullName")}
+                    aria-invalid={errors.fullName ? "true" : "false"}
+                  />
+                  {errors.fullName && (
+                    <p className="text-sm text-destructive">{errors.fullName.message}</p>
+                  )}
+                </div>
+                <div className="grid gap-3">
                   <Label htmlFor="email">E-mail</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="m@exemplo.com"
+                    placeholder="joao@exemplo.com"
                     {...register("email")}
                     aria-invalid={errors.email ? "true" : "false"}
                   />
@@ -121,18 +143,10 @@ export function LoginForm({
                   )}
                 </div>
                 <div className="grid gap-3">
-                  <div className="flex items-center">
-                    <Label htmlFor="password">Senha</Label>
-                    <button
-                      type="button"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Esqueceu sua senha?
-                    </button>
-                  </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
+                  <Label htmlFor="password">Senha</Label>
+                  <Input
+                    id="password"
+                    type="password"
                     {...register("password")}
                     aria-invalid={errors.password ? "true" : "false"}
                   />
@@ -140,18 +154,30 @@ export function LoginForm({
                     <p className="text-sm text-destructive">{errors.password.message}</p>
                   )}
                 </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="confirmPassword">Confirmar senha</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    {...register("confirmPassword")}
+                    aria-invalid={errors.confirmPassword ? "true" : "false"}
+                  />
+                  {errors.confirmPassword && (
+                    <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                  )}
+                </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Entrando..." : "Entrar"}
+                  {isLoading ? "Criando conta..." : "Criar conta"}
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Não tem uma conta?{" "}
+                Já tem uma conta?{" "}
                 <button
                   type="button"
-                  onClick={() => router.push("/register")}
+                  onClick={() => router.push("/login")}
                   className="underline underline-offset-4 hover:text-primary"
                 >
-                  Cadastre-se
+                  Faça login
                 </button>
               </div>
             </div>
@@ -164,4 +190,4 @@ export function LoginForm({
       </div>
     </div>
   )
-}
+} 
