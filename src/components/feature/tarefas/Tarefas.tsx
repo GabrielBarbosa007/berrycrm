@@ -16,7 +16,8 @@ import { Card } from "@/components/ui/card"
 // Se já existir o Switch, descomente a linha abaixo:
 // import { Switch } from "@/components/ui/switch"
 import { ClipboardList, SlidersHorizontal, Filter, ChevronDown, Settings2, CalendarDays, User2, CalendarPlus, ArrowUp01, ArrowDown01, Check, Plus } from "lucide-react"
-import CriarTarefa from "@/components/feature/tarefas/CriarTarefa"
+import CriarTarefaInline from "./CriarTarefaInline"
+
 
 const GROUP_FIELDS = [
   { label: "Data de vencimento", value: "due", icon: CalendarDays },
@@ -164,6 +165,9 @@ export default function Tarefas() {
         </Tooltip>
       </div>
 
+      {/* Criar tarefa inline */}
+      {openCriarTarefa && <CriarTarefaInline />}
+
       {/* Área central de estado vazio */}
       <div className="flex-1 flex flex-col items-center justify-center py-24">
         <Card className="flex flex-col items-center justify-center border-0 shadow-none bg-transparent p-0">
@@ -182,7 +186,6 @@ export default function Tarefas() {
           </Button>
         </Card>
       </div>
-      <CriarTarefa open={openCriarTarefa} onClose={() => setOpenCriarTarefa(false)} />
     </div>
   )
 } 
