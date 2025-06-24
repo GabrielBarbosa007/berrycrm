@@ -74,11 +74,7 @@ const data = {
     },
   ],
   projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
+    
   ],
 }
 
