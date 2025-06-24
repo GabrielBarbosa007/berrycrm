@@ -12,6 +12,7 @@ export interface Tarefa {
 interface TarefasContextType {
   tarefas: Tarefa[]
   adicionarTarefa: (nova: Tarefa) => void
+  editarTarefa: (tarefaEditada: Tarefa) => void
 }
 
 const TarefasContext = createContext<TarefasContextType | undefined>(undefined)
@@ -23,8 +24,12 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
     setTarefas(prev => [...prev, nova])
   }
 
+  const editarTarefa = (tarefaEditada: Tarefa) => {
+    setTarefas(prev => prev.map(t => (t.id === tarefaEditada.id ? tarefaEditada : t)))
+  }
+
   return (
-    <TarefasContext.Provider value={{ tarefas, adicionarTarefa }}>
+    <TarefasContext.Provider value={{ tarefas, adicionarTarefa, editarTarefa }}>
       {children}
     </TarefasContext.Provider>
   )

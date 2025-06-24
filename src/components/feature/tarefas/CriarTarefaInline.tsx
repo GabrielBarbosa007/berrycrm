@@ -11,15 +11,26 @@ import { AssignedUsersSelector, User } from "@/components/feature/tarefas/Assign
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
 
 import { DateSelector } from "@/components/feature/tarefas/DateSelector"; // <-- ✅ Novo import
-import { useTarefas } from "@/context/TarefasContext"
+import { useTarefas, Tarefa } from "@/context/TarefasContext"
 import { v4 as uuidv4 } from "uuid"
 
-export default function CriarTarefaInline({ onClose }: { onClose?: () => void }) {
-  const { adicionarTarefa } = useTarefas()
-  const [titulo, setTitulo] = React.useState("")
-  const [data, setData] = React.useState<Date | null>(new Date())
+interface CriarTarefaInlineProps {
+  onClose?: () => void
+  tarefaParaEditar?: Tarefa | null
+}
+
+export default function CriarTarefaInline({ onClose, tarefaParaEditar }: CriarTarefaInlineProps) {
+  const isEditando = !!tarefaParaEditar
+  const { adicionarTarefa, editarTarefa } = useTarefas()
+  const [titulo, setTitulo] = React.useState(tarefaParaEditar?.titulo || "")
+  const [data, setData] = React.useState<Date | null>(tarefaParaEditar?.data || new Date())
   const [assigned, setAssigned] = React.useState<User[]>([])
   const [showAssignedPopover, setShowAssignedPopover] = React.useState(false)
+
+  React.useEffect(() => {
+    setTitulo(tarefaParaEditar?.titulo || "")
+    setData(tarefaParaEditar?.data || new Date())
+  }, [tarefaParaEditar])
 
   React.useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -31,12 +42,13 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
 
   const salvar = () => {
     if (!titulo) return
-    adicionarTarefa({
-      id: uuidv4(),
+    const novaTarefa: Tarefa = {
+      id: tarefaParaEditar?.id || uuidv4(),
       titulo,
       data,
       usuario: assigned[0]?.name || "Gabriel Barbosa",
-    })
+    }
+    isEditando ? editarTarefa(novaTarefa) : adicionarTarefa(novaTarefa)
     setTitulo("")
     setData(new Date())
     setAssigned([])
@@ -52,7 +64,7 @@ export default function CriarTarefaInline({ onClose }: { onClose?: () => void })
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <Checkbox id="create-task" />
-          <Label htmlFor="create-task" className="text-lg font-semibold select-none cursor-pointer">Create Task</Label>
+          <Label htmlFor="create-task" className="text-lg font-semibold select-none cursor-pointer">{isEditando ? "Edit Task" : "Create Task"}</Label>
         </div>
         <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Fechar" onClick={onClose}>
           <X className="size-5" />

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   Button,
 } from "@/components/ui/button"
@@ -17,9 +17,9 @@ import { Card } from "@/components/ui/card"
 // import { Switch } from "@/components/ui/switch"
 import { ClipboardList, SlidersHorizontal, Filter, ChevronDown, Settings2, CalendarDays, User2, CalendarPlus, ArrowUp01, ArrowDown01, Check, Plus } from "lucide-react"
 import CriarTarefaInline from "./CriarTarefaInline"
-import { AssignedUsersSelector, User } from "@/components/feature/tarefas/AssignedUsersSelector"
 import { useTarefas } from "@/context/TarefasContext"
 import TarefaItem from "./TarefaItem"
+import { Tarefa } from "@/context/TarefasContext"
 
 
 const GROUP_FIELDS = [
@@ -52,12 +52,11 @@ export default function Tarefas() {
   const [groupField, setGroupField] = React.useState("due")
   const [showCompleted, setShowCompleted] = React.useState(true)
   const [openCriarTarefa, setOpenCriarTarefa] = React.useState(false)
-  const [assigned, setAssigned] = React.useState<User[]>([])
+  const { tarefas } = useTarefas()
+  const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null)
 
   const selectedField = ORDER_FIELDS.find(f => f.value === orderField)
   const selectedDirection = ORDER_DIRECTIONS.find(d => d.value === orderDirection)
-
-  const { tarefas } = useTarefas()
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-background">
@@ -171,8 +170,16 @@ export default function Tarefas() {
         </Tooltip>
       </div>
 
-      {/* Criar tarefa inline */}
-      {openCriarTarefa && <CriarTarefaInline onClose={() => setOpenCriarTarefa(false)} />}
+      {/* Criar/Editar tarefa inline */}
+      {(openCriarTarefa || tarefaSelecionada) && (
+        <CriarTarefaInline
+          onClose={() => {
+            setOpenCriarTarefa(false)
+            setTarefaSelecionada(null)
+          }}
+          tarefaParaEditar={tarefaSelecionada}
+        />
+      )}
 
       {/* Lista de tarefas */}
       <div className="flex-1 flex flex-col items-center justify-start py-8 w-full">
@@ -195,7 +202,9 @@ export default function Tarefas() {
             </Card>
           ) : (
             tarefas.map(tarefa => (
-              <TarefaItem key={tarefa.id} tarefa={tarefa} />
+              <div key={tarefa.id} onClick={() => setTarefaSelecionada(tarefa)} style={{ cursor: 'pointer' }}>
+                <TarefaItem tarefa={tarefa} />
+              </div>
             ))
           )}
         </div>
