@@ -15,6 +15,13 @@ import {
 export function ModeToggle() {
   const { setTheme } = useTheme()
 
+  const handleSetTheme = (theme: string) => {
+    setTheme(theme)
+    setTimeout(() => {
+      window.location.reload()
+    }, 100)
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,14 +31,14 @@ export function ModeToggle() {
           <span className="sr-only">Alternar tema</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+      <DropdownMenuContent align="end" onCloseAutoFocus={e => e.preventDefault()}>
+        <DropdownMenuItem onClick={() => handleSetTheme("light")}>
           Claro
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() => handleSetTheme("dark")}>
           Escuro
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => handleSetTheme("system")}>
           Sistema
         </DropdownMenuItem>
       </DropdownMenuContent>
