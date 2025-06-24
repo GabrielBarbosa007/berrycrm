@@ -46,7 +46,62 @@ interface TarefasContextType {
 const TarefasContext = createContext<TarefasContextType | undefined>(undefined)
 
 export const TarefasProvider = ({ children }: { children: React.ReactNode }) => {
-  const [tarefas, setTarefas] = useState<Tarefa[]>([])
+  const [tarefas, setTarefas] = useState<Tarefa[]>(() => {
+    // Adicionar algumas tarefas de teste para demonstrar a funcionalidade
+    const hoje = new Date()
+    const amanha = new Date(hoje)
+    amanha.setDate(amanha.getDate() + 1)
+    const ontem = new Date(hoje)
+    ontem.setDate(ontem.getDate() - 1)
+    
+    return [
+      {
+        id: "1",
+        titulo: "Tarefa de hoje",
+        data: hoje,
+        usuario: "João",
+        concluida: false,
+        createdAt: new Date(),
+        createdBy: "Sistema"
+      },
+      {
+        id: "2",
+        titulo: "Tarefa de amanhã",
+        data: amanha,
+        usuario: "Maria",
+        concluida: false,
+        createdAt: new Date(),
+        createdBy: "Sistema"
+      },
+      {
+        id: "3",
+        titulo: "Tarefa vencida",
+        data: ontem,
+        usuario: "Pedro",
+        concluida: false,
+        createdAt: new Date(),
+        createdBy: "Sistema"
+      },
+      {
+        id: "4",
+        titulo: "Tarefa concluída",
+        data: hoje,
+        usuario: "Ana",
+        concluida: true,
+        createdAt: new Date(),
+        createdBy: "Sistema"
+      },
+      {
+        id: "5",
+        titulo: "Outra tarefa concluída",
+        data: amanha,
+        usuario: "Carlos",
+        concluida: true,
+        createdAt: new Date(),
+        createdBy: "Sistema"
+      }
+    ]
+  })
   
   // Estados de ordenação e agrupamento
   const [sortField, setSortField] = useState<SortField>(() => {
@@ -122,6 +177,17 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
   const { processedTarefas, groupHeaders } = useMemo(() => {
     // Função para obter valor de agrupamento
     const getGroupValue = (tarefa: Tarefa): string => {
+      // Se a tarefa está concluída e showCompleted é true, sempre agrupar em "Concluído"
+      if (tarefa.concluida && showCompleted) {
+        return "Concluído"
+      }
+      
+      // Se showCompleted é false, não incluir tarefas concluídas
+      if (tarefa.concluida && !showCompleted) {
+        return ""
+      }
+
+      // Para tarefas não concluídas, usar o agrupamento normal
       switch (groupField) {
         case "due":
           if (!tarefa.data) return "Sem data"
@@ -187,7 +253,7 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
       }
     }
 
-    // Filtrar tarefas concluídas se necessário
+    // Filtrar tarefas baseado no showCompleted
     const tarefasFiltradas = showCompleted 
       ? tarefas 
       : tarefas.filter(t => !t.concluida)
@@ -197,10 +263,12 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
     
     tarefasFiltradas.forEach(tarefa => {
       const groupKey = getGroupValue(tarefa)
-      if (!grupos[groupKey]) {
-        grupos[groupKey] = []
+      if (groupKey) { // Só adicionar se tiver um grupo válido
+        if (!grupos[groupKey]) {
+          grupos[groupKey] = []
+        }
+        grupos[groupKey].push(tarefa)
       }
-      grupos[groupKey].push(tarefa)
     })
 
     // Ordenar tarefas dentro de cada grupo
@@ -214,7 +282,10 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
       label: key,
       count: grupos[key].length
     })).sort((a, b) => {
-      // Ordenar cabeçalhos por prioridade
+      // Ordenar cabeçalhos por prioridade - "Concluído" sempre por último
+      if (a.key === "Concluído") return 1
+      if (b.key === "Concluído") return -1
+      
       const priority = { "Vencidas": 0, "Hoje": 1, "Amanhã": 2, "Próximas": 3 }
       const aPriority = priority[a.key as keyof typeof priority] ?? 4
       const bPriority = priority[b.key as keyof typeof priority] ?? 4
@@ -228,6 +299,17 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
   const processTarefasWithFilters = (tarefasFiltradas: Tarefa[]) => {
     // Função para obter valor de agrupamento
     const getGroupValue = (tarefa: Tarefa): string => {
+      // Se a tarefa está concluída e showCompleted é true, sempre agrupar em "Concluído"
+      if (tarefa.concluida && showCompleted) {
+        return "Concluído"
+      }
+      
+      // Se showCompleted é false, não incluir tarefas concluídas
+      if (tarefa.concluida && !showCompleted) {
+        return ""
+      }
+
+      // Para tarefas não concluídas, usar o agrupamento normal
       switch (groupField) {
         case "due":
           if (!tarefa.data) return "Sem data"
@@ -298,10 +380,12 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
     
     tarefasFiltradas.forEach(tarefa => {
       const groupKey = getGroupValue(tarefa)
-      if (!grupos[groupKey]) {
-        grupos[groupKey] = []
+      if (groupKey) { // Só adicionar se tiver um grupo válido
+        if (!grupos[groupKey]) {
+          grupos[groupKey] = []
+        }
+        grupos[groupKey].push(tarefa)
       }
-      grupos[groupKey].push(tarefa)
     })
 
     // Ordenar tarefas dentro de cada grupo
@@ -315,7 +399,10 @@ export const TarefasProvider = ({ children }: { children: React.ReactNode }) => 
       label: key,
       count: grupos[key].length
     })).sort((a, b) => {
-      // Ordenar cabeçalhos por prioridade
+      // Ordenar cabeçalhos por prioridade - "Concluído" sempre por último
+      if (a.key === "Concluído") return 1
+      if (b.key === "Concluído") return -1
+      
       const priority = { "Vencidas": 0, "Hoje": 1, "Amanhã": 2, "Próximas": 3 }
       const aPriority = priority[a.key as keyof typeof priority] ?? 4
       const bPriority = priority[b.key as keyof typeof priority] ?? 4

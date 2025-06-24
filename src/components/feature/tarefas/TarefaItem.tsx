@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Task } from "@/hooks/use-tasks";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { CalendarDays, User2, X } from "lucide-react";
+import { CalendarDays, User2, X, Check } from "lucide-react";
 import { Tarefa, useTarefas } from "@/context/TarefasContext";
 import {
   Dialog,
@@ -54,7 +54,7 @@ export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, 
     setIsCompleting(true);
     try {
       await handleCompleteTask(t.id);
-      setTimeout(() => removerTarefa(t.id), 300);
+      // Não remover automaticamente - deixar o contexto gerenciar a exibição
     } catch {
       toast.error("Erro ao concluir tarefa");
       setIsCompleting(false);
@@ -71,34 +71,66 @@ export default function TarefaItem({ tarefa, task, onEdit }: { tarefa?: Tarefa, 
     setModalOpen(true);
   }
 
+  const isCompleted = t.concluida || isCompleting;
+
   return (
     <div
       className={
-        `flex items-center gap-4 p-4 border rounded-xl bg-white shadow-sm mb-2 transition-opacity duration-300 ${
-          isCompleting || t.concluida ? "opacity-50 line-through text-gray-400 pointer-events-none" : ""
+        `flex items-center gap-4 p-4 border rounded-xl bg-white shadow-sm mb-2 transition-all duration-300 ${
+          isCompleted 
+            ? "opacity-60 bg-gray-50" 
+            : "hover:shadow-md"
         }`
       }
     >
-      <Checkbox
-        checked={t.concluida || isCompleting}
-        onClick={onCheck}
-        disabled={isCompleting || t.concluida}
-        className={`transition-all duration-300 ${isCompleting || t.concluida ? "bg-green-200 border-green-400" : ""}`}
-      />
+      {isCompleted ? (
+        <div className="flex items-center justify-center w-4 h-4 rounded border-2 bg-blue-500 border-blue-500">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      ) : (
+        <Checkbox
+          checked={false}
+          onClick={onCheck}
+          disabled={isCompleting}
+          className="transition-all duration-300"
+        />
+      )}
       <div
-        className="flex-1 cursor-pointer rounded-md hover:bg-muted px-2 py-1 transition"
-        onClick={() => onEdit && onEdit()}
-        tabIndex={0}
-        role="button"
-        aria-label="Editar tarefa"
+        className={`flex-1 rounded-md px-2 py-1 transition ${
+          isCompleted 
+            ? "cursor-default" 
+            : "cursor-pointer hover:bg-muted"
+        }`}
+        onClick={() => !isCompleted && onEdit && onEdit()}
+        tabIndex={isCompleted ? -1 : 0}
+        role={isCompleted ? undefined : "button"}
+        aria-label={isCompleted ? undefined : "Editar tarefa"}
       >
-        <div className="font-medium text-base line-clamp-1">{t.titulo}</div>
-        <div className="flex gap-4 text-xs text-muted-foreground mt-1">
-          <span className="flex items-center gap-1"><CalendarDays className="size-3" />{t.data ? new Date(t.data).toLocaleDateString() : '-'}</span>
-          <span className="flex items-center gap-1"><User2 className="size-3" />{t.usuario}</span>
+        <div className={`font-medium text-base line-clamp-1 ${
+          isCompleted ? "text-gray-500 line-through" : ""
+        }`}>
+          {t.titulo}
+        </div>
+        <div className={`flex gap-4 text-xs mt-1 ${
+          isCompleted ? "text-gray-400" : "text-muted-foreground"
+        }`}>
+          <span className="flex items-center gap-1">
+            <CalendarDays className="size-3" />
+            {t.data ? new Date(t.data).toLocaleDateString() : '-'}
+          </span>
+          <span className="flex items-center gap-1">
+            <User2 className="size-3" />
+            {t.usuario}
+          </span>
         </div>
       </div>
-      <Button variant="ghost" size="icon" aria-label="Remover tarefa" onClick={onDeleteClick}>
+      <Button 
+        variant="ghost" 
+        size="icon" 
+        aria-label="Remover tarefa" 
+        onClick={onDeleteClick}
+        className={isCompleted ? "opacity-50" : ""}
+      >
         <X className="size-4" />
       </Button>
       <ConfirmDeleteModal

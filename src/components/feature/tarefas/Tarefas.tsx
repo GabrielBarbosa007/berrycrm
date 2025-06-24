@@ -47,6 +47,10 @@ export default function Tarefas() {
   // Aplicar filtros ao array de tarefas antes do agrupamento/ordenação
   const tarefasFiltradas = useMemo(() => {
     return tarefas.filter(t => {
+      // Se showCompleted é false, excluir tarefas concluídas
+      if (!showCompleted && t.concluida) return false
+      
+      // Aplicar outros filtros
       if (filter.title && !t.titulo.toLowerCase().includes(filter.title.toLowerCase())) return false
       if (filter.assignee && t.usuario !== filter.assignee) return false
       if (filter.dueStart && (!t.data || new Date(t.data) < filter.dueStart)) return false
@@ -55,7 +59,7 @@ export default function Tarefas() {
       if (filter.tags.length > 0) return false // ajuste quando houver tags
       return true
     })
-  }, [tarefas, filter])
+  }, [tarefas, filter, showCompleted])
 
   // Processar tarefas filtradas
   const { processedTarefas: tarefasProcessadas, groupHeaders: headersProcessados } = useMemo(() => {
