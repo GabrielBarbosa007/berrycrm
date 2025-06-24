@@ -166,7 +166,7 @@ export default function Tarefas() {
       </div>
 
       {/* Criar tarefa inline */}
-      {openCriarTarefa && <CriarTarefaInline />}
+      {openCriarTarefa && <CriarTarefaInline onClose={() => setOpenCriarTarefa(false)} />}
 
       {/* Área central de estado vazio */}
       <div className="flex-1 flex flex-col items-center justify-center py-24">

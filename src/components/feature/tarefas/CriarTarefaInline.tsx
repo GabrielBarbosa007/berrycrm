@@ -6,7 +6,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { CalendarDays, User2, CornerUpRight, X, CornerDownLeft } from "lucide-react";
 
-export default function CriarTarefaInline() {
+export default function CriarTarefaInline({ onClose }: { onClose?: () => void }) {
+  React.useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape" && onClose) onClose();
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
   return (
     <div
       className="w-full max-w-[768px] mx-auto mt-6 rounded-2xl border bg-white px-6 pt-4 pb-3 shadow-[0_4px_32px_0_rgba(16,30,54,0.08)]"
@@ -18,7 +26,7 @@ export default function CriarTarefaInline() {
           <Checkbox id="create-task" />
           <Label htmlFor="create-task" className="text-lg font-semibold select-none cursor-pointer">Create Task</Label>
         </div>
-        <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Fechar">
+        <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Fechar" onClick={onClose}>
           <X className="size-5" />
         </Button>
       </div>
@@ -45,7 +53,7 @@ export default function CriarTarefaInline() {
             <Switch id="create-more" />
             <Label htmlFor="create-more" className="text-base font-normal cursor-pointer">Create more</Label>
           </div>
-          <Button variant="ghost" className="h-9 px-4 text-base font-normal text-muted-foreground">Cancel <span className="ml-1 text-xs">ESC</span></Button>
+          <Button variant="ghost" className="h-9 px-4 text-base font-normal text-muted-foreground" onClick={onClose}>Cancel <span className="ml-1 text-xs">ESC</span></Button>
           <Button
             className="h-9 px-5 text-base font-semibold bg-[#2563eb] hover:bg-[#1d4fd7] text-white flex items-center gap-2"
           >
