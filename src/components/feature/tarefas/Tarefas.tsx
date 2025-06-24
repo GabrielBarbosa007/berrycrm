@@ -1,8 +1,7 @@
-import React, { useState } from "react"
+import React, { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { Card } from "@/components/ui/card"
-import { Filter, Plus, ClipboardList } from "lucide-react"
+import { Plus, ClipboardList } from "lucide-react"
 import CriarTarefaInline from "./CriarTarefaInline"
 import { useTarefas } from "@/context/TarefasContext"
 import TarefaItem from "./TarefaItem"
@@ -10,14 +9,23 @@ import { Tarefa } from "@/context/TarefasContext"
 import SortDropdown from "./SortDropdown"
 import GroupByDropdown from "./GroupByDropdown"
 import GroupHeader from "./GroupHeader"
+import TaskFilter, { TaskFilterState } from "./TaskFilter"
 
 export default function Tarefas() {
   const [openCriarTarefa, setOpenCriarTarefa] = useState(false)
   const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null)
   
+  // Estado dos filtros
+  const [filter, setFilter] = useState<TaskFilterState>({
+    title: "",
+    assignee: "",
+    dueStart: null,
+    dueEnd: null,
+    tags: [],
+  })
+
   const { 
-    processedTarefas, 
-    groupHeaders,
+    tarefas,
     sortField,
     sortDirection,
     groupField,
@@ -25,8 +33,34 @@ export default function Tarefas() {
     setSortField,
     setSortDirection,
     setGroupField,
-    setShowCompleted
+    setShowCompleted,
+    processTarefasWithFilters
   } = useTarefas()
+
+  // Lista de cessionários únicos
+  const assignees = useMemo(() => {
+    const set = new Set<string>()
+    tarefas.forEach(t => t.usuario && set.add(t.usuario))
+    return Array.from(set)
+  }, [tarefas])
+
+  // Aplicar filtros ao array de tarefas antes do agrupamento/ordenação
+  const tarefasFiltradas = useMemo(() => {
+    return tarefas.filter(t => {
+      if (filter.title && !t.titulo.toLowerCase().includes(filter.title.toLowerCase())) return false
+      if (filter.assignee && t.usuario !== filter.assignee) return false
+      if (filter.dueStart && (!t.data || new Date(t.data) < filter.dueStart)) return false
+      if (filter.dueEnd && (!t.data || new Date(t.data) > filter.dueEnd)) return false
+      // Tags/status: placeholder
+      if (filter.tags.length > 0) return false // ajuste quando houver tags
+      return true
+    })
+  }, [tarefas, filter])
+
+  // Processar tarefas filtradas
+  const { processedTarefas: tarefasProcessadas, groupHeaders: headersProcessados } = useMemo(() => {
+    return processTarefasWithFilters(tarefasFiltradas)
+  }, [tarefasFiltradas, processTarefasWithFilters])
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-background">
@@ -60,15 +94,12 @@ export default function Tarefas() {
           onSortFieldChange={setSortField}
           onSortDirectionChange={setSortDirection}
         />
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-2 border border-dashed border-input bg-white text-muted-foreground">
-              <Filter className="size-4" />
-              <span>Filtro</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Filtrar tarefas</TooltipContent>
-        </Tooltip>
+        <TaskFilter
+          value={filter}
+          onChange={setFilter}
+          assignees={assignees}
+          onClear={() => setFilter({ title: "", assignee: "", dueStart: null, dueEnd: null, tags: [] })}
+        />
       </div>
 
       {/* Criar/Editar tarefa inline */}
@@ -85,7 +116,7 @@ export default function Tarefas() {
       {/* Lista de tarefas agrupadas */}
       <div className="flex-1 flex flex-col items-center justify-start py-8 w-full">
         <div className="w-full max-w-2xl">
-          {groupHeaders.length === 0 ? (
+          {headersProcessados.length === 0 ? (
             <Card className="flex flex-col items-center justify-center border-0 shadow-none bg-transparent p-0">
               <ClipboardList className="size-20 text-muted-foreground mb-6" />
               <h2 className="text-2xl font-semibold mb-2">Tarefas</h2>
@@ -102,10 +133,10 @@ export default function Tarefas() {
               </Button>
             </Card>
           ) : (
-            groupHeaders.map(header => (
+            headersProcessados.map(header => (
               <div key={header.key}>
                 <GroupHeader label={header.label} count={header.count} />
-                {processedTarefas[header.key].map(tarefa => (
+                {tarefasProcessadas[header.key].map(tarefa => (
                   <TarefaItem
                     key={tarefa.id}
                     tarefa={tarefa}
